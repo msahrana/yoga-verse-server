@@ -25,8 +25,8 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
-    const productsCollections = client.db("yogaDB").collection('products');
-    // const blogsCollections = client.db("yogaDB").collection('blogs');
+    const productsCollections = client.db("yogaDB").collection("products");
+    const blogsCollections = client.db("yogaDB").collection("blogs");
     // const usersCollections = client.db("yogaDB").collection('users');
 
     app.post("/products", async (req, res) => {
@@ -37,6 +37,31 @@ async function run() {
 
     app.get("/products", async (req, res) => {
       const result = await productsCollections.find().toArray();
+      res.send(result);
+    });
+
+    app.get('/product/:id', async(req,res)=>{
+      const id = req.params.id
+      const query = {_id: new ObjectId(id)}
+      const result = await productsCollections.findOne(query)
+      res.send(result)
+    })
+
+    app.post("/blogs", async (req, res) => {
+      const blog = req.body;
+      const result = await blogsCollections.insertOne(blog);
+      res.send(result);
+    });
+
+    app.get("/blogs", async (req, res) => {
+      const result = await blogsCollections.find().toArray();
+      res.send(result);
+    });
+
+    app.get("/blog/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = {_id: new ObjectId(id)};
+      const result = await blogsCollections.findOne(query);
       res.send(result);
     });
 
