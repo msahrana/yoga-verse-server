@@ -27,7 +27,7 @@ async function run() {
   try {
     const productsCollections = client.db("yogaDB").collection("products");
     const blogsCollections = client.db("yogaDB").collection("blogs");
-    // const usersCollections = client.db("yogaDB").collection('users');
+    const usersCollections = client.db("yogaDB").collection('users');
 
     app.post("/products", async (req, res) => {
       const product = req.body;
@@ -64,6 +64,17 @@ async function run() {
       const result = await blogsCollections.findOne(query);
       res.send(result);
     });
+
+    app.post('/users', async(req,res)=>{
+      const user = req.body
+      const result = await usersCollections.insertOne(user)
+      res.send(result)
+    })
+
+    app.get('/users', async(req,res)=>{
+      const result = await usersCollections.find().toArray()
+      res.send(result)
+    })
 
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
