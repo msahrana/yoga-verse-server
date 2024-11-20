@@ -27,7 +27,7 @@ async function run() {
   try {
     const productsCollections = client.db("yogaDB").collection("products");
     const blogsCollections = client.db("yogaDB").collection("blogs");
-    const usersCollections = client.db("yogaDB").collection('users');
+    const usersCollections = client.db("yogaDB").collection("users");
 
     app.post("/products", async (req, res) => {
       const product = req.body;
@@ -40,12 +40,15 @@ async function run() {
       res.send(result);
     });
 
-    app.get('/product/:id', async(req,res)=>{
-      const id = req.params.id
-      const query = {_id: new ObjectId(id)}
-      const result = await productsCollections.findOne(query)
-      res.send(result)
-    })
+    app.get("/product/:id", async (req, res) => {
+      const id = req.params.id;
+      if (!ObjectId.isValid(id)) {
+        return res.status(400).send({error: "Invalid product ID"});
+      }
+      const query = {_id: new ObjectId(id)};
+      const result = await productsCollections.findOne(query);
+      res.send(result);
+    });
 
     app.post("/blogs", async (req, res) => {
       const blog = req.body;
@@ -60,21 +63,28 @@ async function run() {
 
     app.get("/blog/:id", async (req, res) => {
       const id = req.params.id;
+      // Validate the ID format
+      if (!ObjectId.isValid(id)) {
+        return res.status(400).send({error: "Invalid blog ID"});
+      }
       const query = {_id: new ObjectId(id)};
       const result = await blogsCollections.findOne(query);
+      if (!result) {
+        return res.status(404).send({error: "Blog not found"});
+      }
       res.send(result);
     });
 
-    app.post('/users', async(req,res)=>{
-      const user = req.body
-      const result = await usersCollections.insertOne(user)
-      res.send(result)
-    })
+    app.post("/users", async (req, res) => {
+      const user = req.body;
+      const result = await usersCollections.insertOne(user);
+      res.send(result);
+    });
 
-    app.get('/users', async(req,res)=>{
-      const result = await usersCollections.find().toArray()
-      res.send(result)
-    })
+    app.get("/users", async (req, res) => {
+      const result = await usersCollections.find().toArray();
+      res.send(result);
+    });
 
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
